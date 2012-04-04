@@ -22,7 +22,10 @@ public class DefaultWebappMetricsFilter extends WebappMetricsFilter {
     private static final int OK = 200;
     private static final int CREATED = 201;
     private static final int NO_CONTENT = 204;
+    private static final int NOT_MODIFIED = 304;
     private static final int BAD_REQUEST = 400;
+    private static final int UNAUTHORIZED = 401;
+    private static final int FORBIDDEN = 403;
     private static final int NOT_FOUND = 404;
     private static final int SERVER_ERROR = 500;
 
@@ -38,7 +41,10 @@ public class DefaultWebappMetricsFilter extends WebappMetricsFilter {
         meterNamesByStatusCode.put(OK, NAME_PREFIX + "ok");
         meterNamesByStatusCode.put(CREATED, NAME_PREFIX + "created");
         meterNamesByStatusCode.put(NO_CONTENT, NAME_PREFIX + "noContent");
+        meterNamesByStatusCode.put(NOT_MODIFIED, NAME_PREFIX + "notModified");
         meterNamesByStatusCode.put(BAD_REQUEST, NAME_PREFIX + "badRequest");
+        meterNamesByStatusCode.put(UNAUTHORIZED, NAME_PREFIX + "unauthorized");
+        meterNamesByStatusCode.put(FORBIDDEN, NAME_PREFIX + "forbidden");
         meterNamesByStatusCode.put(NOT_FOUND, NAME_PREFIX + "notFound");
         meterNamesByStatusCode.put(SERVER_ERROR, NAME_PREFIX + "serverError");
         return meterNamesByStatusCode;
