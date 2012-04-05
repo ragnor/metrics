@@ -385,7 +385,7 @@ public class JmxReporter extends AbstractReporter implements MetricsRegistryList
             try {
                 metric.processWith(this, name, new Context(name, new ObjectName(name.getMBeanName())));
             } catch (Exception e) {
-                LOGGER.warn("Error processing {}", name, e);
+                LOGGER.warn("Error processing " + name, e);
             }
         }
     }

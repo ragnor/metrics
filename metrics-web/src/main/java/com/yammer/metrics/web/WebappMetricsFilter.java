@@ -61,6 +61,7 @@ public abstract class WebappMetricsFilter implements Filter {
 
 	@Override
 	public void destroy() {
+		Metrics.shutdown();
 	}
 
 	@Override
@@ -85,15 +86,14 @@ public abstract class WebappMetricsFilter implements Filter {
 			timer.stop();			
 			activeRequests.dec();
 			markMeterForStatusCode(path, wrappedResponse.getStatus());
+	
 		}
 	}
 
 	private void markMeterForStatusCode(String path, int status) {
 		ConcurrentMap<Integer, Meter> map = metersByPath.get(path);
-		// race condition and some invocation may don't be count
 		if (map == null) {
 			map = createMap(path);
-			metersByPath.put(path, map);
 		}
 
 		increment(map, status);
@@ -102,6 +102,7 @@ public abstract class WebappMetricsFilter implements Filter {
 			increment(metersByPath.get(TOTAL), status);
 		}
 	}
+	
 
 	private void increment(Map<Integer, Meter> map, int status) {
 		final Meter metric = map.get(status);
@@ -112,7 +113,11 @@ public abstract class WebappMetricsFilter implements Filter {
 		}
 	}
 
-	private ConcurrentMap<Integer, Meter> createMap(String path) {
+	private synchronized ConcurrentMap<Integer, Meter> createMap(String path) {
+		if (metersByPath.get(path) != null) {
+			return metersByPath.get(path);
+		}
+		
 		ConcurrentMap<Integer, Meter> map = new ConcurrentHashMap<Integer, Meter>();
 
 		for (Entry<Integer, String> entry : meterNamesByStatusCode.entrySet()) {
@@ -124,6 +129,8 @@ public abstract class WebappMetricsFilter implements Filter {
 		map.put(-1, Metrics.newMeter(new MetricName(WebappMetricsFilter.class,
 				path, otherMetricName), "responses", TimeUnit.SECONDS));
 
+		metersByPath.put(path, map);
+		
 		return map;
 	}
 
